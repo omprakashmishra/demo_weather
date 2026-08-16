@@ -1,4 +1,4 @@
-package com.omslab.weather.models
+package com.omslab.weather.data.models
 
 data class WeatherDataModel(
     val base: String,

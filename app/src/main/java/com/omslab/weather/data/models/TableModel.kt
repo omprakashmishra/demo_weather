@@ -1,4 +1,4 @@
-package com.omslab.weather.models
+package com.omslab.weather.data.models
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

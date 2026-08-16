@@ -1,20 +1,19 @@
-package com.collabera.weather.presentation.ui.dashboard.adapter
+package com.omslab.weather.presentation.ui.dashboard.adapter
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.collabera.weather.R
-import com.collabera.weather.databinding.WeatherItemBinding
-import com.collabera.weather.models.UserLocationTableModel
-
+import com.omslab.weather.R
+import com.omslab.weather.databinding.WeatherItemBinding
+import com.omslab.weather.data.models.UserLocationTableModel
 
 class WeatherListAdapter : RecyclerView.Adapter<WeatherListAdapter.MyViewHolder>() {
 
     var list: List<UserLocationTableModel>? = null
 
     fun updateData(items: List<UserLocationTableModel>) {
-         this.list=items
+        this.list = items
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
@@ -25,30 +24,29 @@ class WeatherListAdapter : RecyclerView.Adapter<WeatherListAdapter.MyViewHolder>
 
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: MyViewHolder, pos: Int) {
-
         holder.binding.apply {
-            if(list!![pos].icon.contains("d")){
-                //day
-                this.ivWeatherSun.setImageResource(R.drawable.sunshine)
-            }else{
-                //night
+            if (list!![pos].icon.contains("d")) {
+                ivWeatherSun.setImageResource(R.drawable.sunshine)
+            } else {
                 ivWeatherSun.setImageResource(R.drawable.night_ic)
             }
-            tvTemperature.text="Temperature- "+ list!![pos].temperature +" ℃"
-            tvDescription.text="Description - "+list!![pos].description
-            tvCountry.text="Country - "+list!![pos].country
-            tvCity.text="City - "+list!![pos].city
-            tvSunset.text="Sunset - "+list!![pos].sunset
-            tvSunrise.text="Sunrise - "+list!![pos].sunrise
-            tvUpdateDateTime.text=list!![pos].entryDateTime
+            tvTemperature.text = "Temperature: ${list!![pos].temperature}°C"
+            tvDescription.text = "Description: ${list!![pos].description}"
+            tvCountry.text = "Country: ${list!![pos].country}"
+            tvCity.text = "City: ${list!![pos].cityName}"
+            tvSunset.text = "Sunset: ${list!![pos].sunset}"
+            tvSunrise.text = "Sunrise: ${list!![pos].sunrise}"
+            tvUpdateDateTime.text = list!![pos].entryDateTime
         }
     }
+
     override fun getItemCount(): Int {
         return if (list == null) 0 else list!!.size
     }
 
-    class MyViewHolder(itemView: WeatherItemBinding) :RecyclerView.ViewHolder(itemView.root) {
+    class MyViewHolder(itemView: WeatherItemBinding) : RecyclerView.ViewHolder(itemView.root) {
         var binding: WeatherItemBinding
+
         init {
             binding = itemView
         }

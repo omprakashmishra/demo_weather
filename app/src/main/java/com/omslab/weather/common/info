@@ -1,0 +1,38 @@
+┌──────────────────────────────┐
+│        Presentation          │
+│                              │
+│  DashboardViewModel          │
+│  LoginViewModel              │
+└──────────────┬───────────────┘
+               │
+               ▼
+┌──────────────────────────────┐
+│          Domain              │
+│                              │
+│  LocationUseCase             │
+│  UserUseCase                 │
+│  ValidateInputUseCase        │
+│  GetWeatherUseCase           │
+│                              │
+│  Repository Interfaces       │
+│  ILocationRepository         │
+│  IUserRepository             │
+│  IWeatherRepository          │
+└──────────────┬───────────────┘
+               │
+               ▼
+┌──────────────────────────────┐
+│            Data              │
+│                              │
+│  RepositoryImpl              │
+│  LocationRepositoryImpl      │
+│  UserRepositoryImpl          │
+│  WeatherRepositoryImpl       │
+│                              │
+│  DataSources                 │
+│  Local / Remote              │
+└──────────────┬───────────────┘
+               │
+          ┌────┴────┐
+          ▼         ▼
+       Room      Retrofit

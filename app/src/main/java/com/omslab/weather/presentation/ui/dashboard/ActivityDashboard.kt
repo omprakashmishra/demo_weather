@@ -1,4 +1,4 @@
-package com.collabera.weather.presentation.ui.dashboard
+package com.omslab.weather.presentation.ui.dashboard
 
 import android.Manifest
 import android.content.Intent
@@ -11,17 +11,17 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.collabera.weather.databinding.ActivityDashboardBinding
-import com.collabera.weather.presentation.ui.dashboard.adapter.DashboardPagerAdapter
-import com.collabera.weather.presentation.ui.loginReg.LoginAc
-import com.collabera.weather.presentation.viewmodel.DashBoardViewModel
-import com.collabera.weather.common.util.Constants.PERMISSION_REQUEST_ACCESS_FINE_LOCATION
+import com.omslab.weather.databinding.ActivityDashboardBinding
+import com.omslab.weather.presentation.ui.dashboard.adapter.DashboardPagerAdapter
+import com.omslab.weather.presentation.ui.loginReg.LoginAc
+import com.omslab.weather.presentation.viewmodel.DashboardViewModel
+import com.omslab.weather.common.util.Constants.PERMISSION_REQUEST_ACCESS_FINE_LOCATION
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class ActivityDashboard : AppCompatActivity() {
     private lateinit var binding: ActivityDashboardBinding
-    private val viewModel: DashBoardViewModel by viewModels()
+    private val viewModel: DashboardViewModel by viewModels()
     private var locationListener: LocationListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,6 +35,7 @@ class ActivityDashboard : AppCompatActivity() {
 
     private fun initView() {
         binding.logOut.setOnClickListener {
+            viewModel.deleteOldLocations()
             intent = Intent(this, LoginAc::class.java)
             finish()
             startActivity(intent)
@@ -64,19 +65,19 @@ class ActivityDashboard : AppCompatActivity() {
 
     private fun getLocation() {
         val locationManager = getSystemService(LOCATION_SERVICE) as LocationManager?
-
-        // Remove any previous listener to avoid duplicates
         locationListener?.let {
             locationManager?.removeUpdates(it)
         }
 
         locationListener = LocationListener { location ->
-            location?.let {
-                val lat = it.latitude.toString()
-                val lon = it.longitude.toString()
-                viewModel.storeLatLong(lat, lon)
-                // Optionally, you can make the API call here or observe the ViewModel
-                // to trigger the API call when location is updated
+            location.let {
+                val lat = it.latitude
+                val lon = it.longitude
+
+                viewModel.storeLatLong(
+                    lat.toString(),
+                    lon.toString()
+                )
             }
         }
 

@@ -1,4 +1,4 @@
-package com.collabera.weather.presentation.ui.loginReg
+package com.omslab.weather.presentation.ui.loginReg
 
 import android.content.Context
 import android.content.Intent
@@ -6,17 +6,17 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.collabera.weather.databinding.ActivityLoginBinding
-import com.collabera.weather.presentation.ui.dashboard.ActivityDashboard
-import com.collabera.weather.presentation.viewmodel.LoginDBViewModel
-import com.collabera.weather.common.util.Constants.PrimaryEmail
+import com.omslab.weather.databinding.ActivityLoginBinding
+import com.omslab.weather.presentation.ui.dashboard.ActivityDashboard
+import com.omslab.weather.presentation.viewmodel.LoginViewModel
+import com.omslab.weather.common.util.Constants.PrimaryEmail
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class LoginAc : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
-    val viewModel: LoginDBViewModel by viewModels()
+    val viewModel: LoginViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)

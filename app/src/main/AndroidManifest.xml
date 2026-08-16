@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
     <application
         android:name=".common.BaseApplication"
         android:allowBackup="true"
@@ -16,7 +18,7 @@
         tools:targetApi="31">
 
         <activity
-            android:name=".ui.SplashAc"
+            android:name=".presentation.ui.SplashAc"
             android:exported="true"
             android:theme="@style/Theme.WeatherSample.NoActionBar">
             <intent-filter>
@@ -26,15 +28,15 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.loginReg.LoginAc"
+            android:name=".presentation.ui.loginReg.LoginAc"
             android:exported="true"
             android:theme="@style/Theme.WeatherSample.NoActionBar" />
         <activity
-            android:name=".ui.loginReg.RegisterAc"
+            android:name=".presentation.ui.loginReg.RegisterAc"
             android:exported="true"
             android:theme="@style/Theme.WeatherSample.NoActionBar" />
         <activity
-            android:name=".ui.dashboard.ActivityDashboard"
+            android:name=".presentation.ui.dashboard.ActivityDashboard"
             android:exported="true"
             android:theme="@style/Theme.WeatherSample.NoActionBar" />
     </application>

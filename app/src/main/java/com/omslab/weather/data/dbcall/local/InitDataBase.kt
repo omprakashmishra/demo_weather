@@ -1,4 +1,4 @@
-package com.omslab.weather.database
+package com.omslab.weather.data.dbcall.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase

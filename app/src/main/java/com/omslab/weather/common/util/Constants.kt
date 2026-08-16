@@ -1,4 +1,4 @@
-package com.collabera.weather.common.util
+package com.omslab.weather.common.util
 
 object Constants {
      const val BASE_URL = "https://api.openweathermap.org/data/2.5/"

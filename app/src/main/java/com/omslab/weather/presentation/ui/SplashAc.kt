@@ -1,13 +1,13 @@
-package com.collabera.weather.presentation.ui
+package com.omslab.weather.presentation.ui
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import com.collabera.weather.R
-import com.collabera.weather.databinding.ActivitySplashScreenBinding
-import com.collabera.weather.presentation.ui.loginReg.LoginAc
+import com.omslab.weather.R
+import com.omslab.weather.databinding.ActivitySplashScreenBinding
+import com.omslab.weather.presentation.ui.loginReg.LoginAc
 
 class SplashAc : AppCompatActivity() {
     private lateinit var binding: ActivitySplashScreenBinding

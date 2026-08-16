@@ -6,18 +6,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.omslab.weather.common.MySharedPreference
 import com.omslab.weather.common.util.Constants
-import com.omslab.weather.data.datasource.UserLocalDataSource
 import com.omslab.weather.domain.models.User
+import com.omslab.weather.domain.usecase.user.UserUseCase
 import com.omslab.weather.domain.usecase.user.ValidateInputUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class LoginDBViewModel @Inject constructor(
+class LoginViewModel @Inject constructor(
     val preference: MySharedPreference,
-    val userLocalDataSource: UserLocalDataSource,
-    val validateInputUseCase: ValidateInputUseCase
+    private val userUseCase: UserUseCase,
+    private val validateInputUseCase: ValidateInputUseCase
 ) : ViewModel() {
 
     private val _userList = MutableLiveData<List<User>>()
@@ -41,7 +41,7 @@ class LoginDBViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            userLocalDataSource.getUser(email, password).collect { users ->
+            userUseCase.loginUser(email, password).collect { users ->
                 _userList.postValue(users)
                 if (users.isEmpty()) {
                     _message.postValue("Please register and continue")
@@ -62,7 +62,7 @@ class LoginDBViewModel @Inject constructor(
     }
 
     private fun registerUser(user: User) = viewModelScope.launch {
-        val result = userLocalDataSource.registerUser(user)
+        val result = userUseCase.registerUser(user)
         result.fold(
             onSuccess = { userId ->
                 if (userId > 0) {

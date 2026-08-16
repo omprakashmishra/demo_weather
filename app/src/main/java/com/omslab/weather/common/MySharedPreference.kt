@@ -1,4 +1,4 @@
-package com.collabera.weather.common
+package com.omslab.weather.common
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext

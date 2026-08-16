@@ -1,4 +1,4 @@
-package com.collabera.weather.common.util
+package com.omslab.weather.common.util
 
 object UtilsKt {
     private val NAME_REGEX = Regex(

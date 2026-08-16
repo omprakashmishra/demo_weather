@@ -1,18 +1,18 @@
-package com.collabera.weather.presentation.viewmodel
+package com.omslab.weather.presentation.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.collabera.weather.common.MySharedPreference
-import com.collabera.weather.models.UserLocationTableModel
-import com.collabera.weather.models.WeatherDataModel
-import com.collabera.weather.repo.DBRepository
-import com.collabera.weather.repo.WeatherRepository
-import com.collabera.weather.common.util.Constants
+import com.omslab.weather.common.MySharedPreference
+import com.omslab.weather.common.util.Constants
+import com.omslab.weather.domain.models.Location
+import com.omslab.weather.domain.models.Weather
+import com.omslab.weather.domain.usecase.location.LocationUseCase
+import com.omslab.weather.domain.usecase.weather.GetWeatherUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -20,93 +20,155 @@ import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
-class DashBoardViewModel @Inject constructor(
-    val sp: MySharedPreference,
-    private val networkRepo: WeatherRepository,
-    private val dbRepository: DBRepository
+class DashboardViewModel @Inject constructor(
+    val sharedPref: MySharedPreference,
+    private val getWeatherUseCase: GetWeatherUseCase,
+    private val locationUseCase: LocationUseCase
 ) : ViewModel() {
 
-    private val _response = MutableLiveData<WeatherDataModel>()
-    val weatherResponse: LiveData<WeatherDataModel>
-        get() = _response
+    private val _weatherState = MutableLiveData<WeatherState>()
+    val weatherState: LiveData<WeatherState> get() = _weatherState
+
+    private val _locationState = MutableLiveData<LocationState>()
+    val locationState: LiveData<LocationState> get() = _locationState
+
+    private val _weatherList = MutableLiveData<List<Location>>()
+    val weatherList: LiveData<List<Location>> get() = _weatherList
+
+    private val _currentWeather = MutableLiveData<Weather?>()
+    val currentWeather: LiveData<Weather?> get() = _currentWeather
 
     init {
-        // Check if we have stored location data
-        val lat = sp.getString(Constants.UpdatedLat)
-        val long = sp.getString(Constants.UpdatedLong)
-
-        // Only fetch weather if both lat and long are available
-        if (!lat.isNullOrEmpty() && !long.isNullOrEmpty()) {
-            updateWeatherBasedOnLatestLatLong(lat, long, Constants.AppId)
-        } else {
-            Log.d("===>", "No stored location found. Waiting for location update.")
-        }
-
-        getStoredLocation(sp.getString(Constants.PrimaryEmail)!!)
+        loadStoredLocations()
     }
 
-    fun updateWeatherBasedOnLatestLatLong(lat: String, long: String, appId: String) = viewModelScope.launch {
-        // Add logging to verify values
-        Log.d("===>", "Fetching weather for Lat: $lat, Long: $long")
+    private fun loadStoredLocations() {
+        val email = sharedPref.getString(Constants.PrimaryEmail) ?: return
 
-        if (lat.isEmpty() || long.isEmpty()) {
-            Log.e("===>", "Latitude or Longitude is empty!")
-            return@launch
-        }
-
-        networkRepo.getWeatherByLocation(lat, long, appId).let { response ->
-            if (response.isSuccessful) {
-                Log.d("===>getWeatherAPI", "response: ${response.body()}")
-                _response.postValue(response.body())
-            } else {
-                Log.e("===>", "Error Type Code: ${response.code()}, Message: ${response.message()}")
-                Log.e("===>", "Error Body: ${response.errorBody()?.string()}")
-            }
+        viewModelScope.launch {
+            locationUseCase.getStoredLocations(email)
+                .catch {
+                    _locationState.postValue(
+                        LocationState.Error("Failed to load locations")
+                    )
+                }
+                .collectLatest { locations ->
+                    _weatherList.postValue(locations)
+                    if (locations.isEmpty()) {
+                        loadLocationFromPreferences()
+                    }else{
+                        val firstLocation = locations.firstOrNull()
+                        firstLocation?.let {
+                            fetchWeather(it.lat, it.lon)
+                        }
+                    }
+                }
         }
     }
 
-    fun enterUserLocation(locationData: UserLocationTableModel) {
-        viewModelScope.launch(Dispatchers.IO) {
-            dbRepository.insertLocationData(locationData)
-        }
-    }
-
-    private val _weatherList = MutableLiveData<List<UserLocationTableModel>>()
-    val weatherList: LiveData<List<UserLocationTableModel>> get() = _weatherList
-
-    private fun getStoredLocation(email: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            dbRepository.getStoredLocation(email).collect { item ->
-                item.let {
-                    _weatherList.postValue(item)
+    private fun loadLocationFromPreferences() {
+        viewModelScope.launch {
+            val location = locationUseCase.getCurrentLocation()
+            location?.let {
+                if (it.lat.isNotEmpty() && it.lon.isNotEmpty()) {
+                    fetchWeather(it.lat, it.lon)
                 }
             }
         }
     }
 
-    //------------------------------------------------
-    fun utcFormatted(time: Long, tmPattern: String): String? {
-        return SimpleDateFormat(tmPattern, Locale.ENGLISH).format(Date(time * 1000))
-    }
-
-    fun storeLatLong(lat: String, long: String) {
-        // Get stored values
-        val storedLat = sp.getString(Constants.UpdatedLat)
-        val storedLong = sp.getString(Constants.UpdatedLong)
-
-        // Only update if coordinates have changed
-        if (lat == storedLat && long == storedLong) {
-            Log.d("===>", "Location unchanged: $lat|$long")
+    fun fetchWeather(lat: String, lon: String) {
+        if (lat.isEmpty() || lon.isEmpty()) {
+            _weatherState.postValue(WeatherState.Error("Latitude or Longitude is empty"))
             return
         }
 
-        // Store new coordinates
-        sp.setString(Constants.UpdatedLat, lat)
-        sp.setString(Constants.UpdatedLong, long)
+        _weatherState.postValue(WeatherState.Loading)
 
-        Log.d("===>", "Storing new location: Lat: $lat, Long: $long")
+        viewModelScope.launch {
+            val result = getWeatherUseCase(lat, lon)
+            result.fold(
+                onSuccess = { weather ->
+                    _currentWeather.postValue(weather)
+                    _weatherState.postValue(WeatherState.Success(weather))
 
-        // Fetch weather for new location
-        updateWeatherBasedOnLatestLatLong(lat, long, Constants.AppId)
+                    val location = Location(
+                        lat = lat,
+                        lon = lon,
+                        cityName = weather.cityName,
+                        country = weather.country,
+                        temperature = weather.temperature.toString(),
+                        description = weather.weatherDescription,
+                        icon = weather.weatherIcon,
+                        sunrise = utcFormatted(weather.sunrise, Constants.timeAm),
+                        sunset = utcFormatted(weather.sunset, Constants.timeAm),
+                        entryDateTime = utcFormatted(weather.timestamp, Constants.dateTimeAm)
+                    )
+                    saveLocation(location)
+                },
+                onFailure = { error ->
+                    _weatherState.postValue(WeatherState.Error(error.message ?: "Unknown error occurred"))
+                }
+            )
+        }
+    }
+
+    fun saveLocation(location: Location) {
+        viewModelScope.launch {
+            try {
+                val saved = locationUseCase.saveLocation(location)
+                if (!saved) {
+                    _locationState.postValue(LocationState.Error("Location already exists"))
+                }
+            } catch (e: Exception) {
+                _locationState.postValue(
+                    LocationState.Error("Failed to save location")
+                )
+            }
+        }
+    }
+
+    fun deleteOldLocations() {
+        viewModelScope.launch {
+            try {
+                val email = sharedPref.getString(Constants.PrimaryEmail)
+                locationUseCase.deleteOldLocations(email ?: "")
+            } catch (e: Exception) {
+                _locationState.postValue(LocationState.Error("Failed to delete old locations"))
+            }
+        }
+    }
+
+
+
+    fun storeLatLong(lat: String, lon: String) {
+        val storedLat = sharedPref.getString(Constants.UpdatedLat)
+        val storedLon = sharedPref.getString(Constants.UpdatedLong)
+
+        if (lat == storedLat && lon == storedLon) {
+            return
+        }
+        fetchWeather(lat, lon)
+         sharedPref.setString(Constants.UpdatedLat, lat)
+        sharedPref.setString(Constants.UpdatedLong, lon)
+    }
+
+    fun utcFormatted(time: Long, pattern: String): String? {
+        return try {
+            SimpleDateFormat(pattern, Locale.ENGLISH).format(Date(time * 1000))
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    sealed class WeatherState {
+        object Loading : WeatherState()
+        data class Success(val weather: Weather) : WeatherState()
+        data class Error(val message: String) : WeatherState()
+    }
+
+    sealed class LocationState {
+        object Saved : LocationState()
+        data class Error(val message: String) : LocationState()
     }
 }

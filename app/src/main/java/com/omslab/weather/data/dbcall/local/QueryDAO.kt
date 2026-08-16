@@ -1,4 +1,4 @@
-package com.omslab.weather.database
+package com.omslab.weather.data.dbcall.local
 import androidx.room.*
 import androidx.room.OnConflictStrategy.Companion.IGNORE
 import com.omslab.weather.data.models.TableModel
@@ -25,11 +25,14 @@ interface QueryDAO {
     @Insert(onConflict = IGNORE)
     suspend fun insertLocationData(userLocationTableModel: UserLocationTableModel)
 
-    @Query("SELECT * FROM $LocationTable WHERE email =:email")
+    @Query("SELECT * FROM $LocationTable WHERE email = :email ORDER BY entryDateTime DESC")
     fun getStoredLocation(email:String): Flow<List<UserLocationTableModel>>
 
     //------------------------
+    @Query(" DELETE FROM $LocationTable WHERE email = :email AND id NOT IN (SELECT id FROM $LocationTable WHERE email = :email ORDER BY id DESC LIMIT 1)")
+    suspend fun deleteOldLocations(email: String?)
+
     @Query("DELETE FROM $UserTable")
-    fun clearDb(): Flow<Unit>
+    suspend fun clearDb(): Int
 
 }

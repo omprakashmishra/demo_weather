@@ -1,4 +1,4 @@
-package com.omslab.weather.domain.usecase.validation
+package com.omslab.weather.domain.usecase.user
 
 import com.omslab.weather.common.util.UtilsKt
 import javax.inject.Inject

@@ -1,4 +1,4 @@
-package com.collabera.weather
+package com.omslab.weather
 
 import org.junit.Test
 

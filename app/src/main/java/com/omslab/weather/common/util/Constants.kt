@@ -1,7 +1,8 @@
 package com.omslab.weather.common.util
 
 object Constants {
-     const val BASE_URL = "https://api.openweathermap.org/data/2.5/"
+     const val WEATHER_BASE_URL = "https://api.openweathermap.org/data/2.5/"
+     const val FAST_API_BASE_URL = "https://weatheraibackend.onrender.com/"
      const val AppId = "13dadcd11e7e0ae2ec507688bd9e2f70"
 
      const val DataBaseName = "UserDataBase"
@@ -12,6 +13,7 @@ object Constants {
 
      const val UpdatedLat = "UpdatedLat"
      const val UpdatedLong = "UpdatedLong"
+     const val UpdatedAccuracy = "UpdatedAccuracy"
      const val timeAm = "hh:mm a"
      const val dateTimeAm = "dd/MM/yyyy hh:mm a"
 

@@ -71,12 +71,9 @@ class ActivityDashboard : AppCompatActivity() {
 
         locationListener = LocationListener { location ->
             location.let {
-                val lat = it.latitude
-                val lon = it.longitude
-
                 viewModel.storeLatLong(
-                    lat.toString(),
-                    lon.toString()
+                    it.latitude.toString(),
+                    it.longitude.toString()
                 )
             }
         }

@@ -3,6 +3,7 @@ package com.omslab.weather.common
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
+import androidx.core.content.edit
 
 class MySharedPreference @Inject constructor(@ApplicationContext val context: Context){
 
@@ -16,9 +17,9 @@ class MySharedPreference @Inject constructor(@ApplicationContext val context: Co
 
     fun setString( key: String, value: String?) {
        if (key == FIREBASE_TOKEN) {
-           sharedPreferencesFirebase.edit().putString(key, value).apply()
+           sharedPreferencesFirebase.edit { putString(key, value) }
         } else {
-           sharedPreferences.edit().putString(key, value).apply()
+           sharedPreferences.edit { putString(key, value) }
         }
     }
 
@@ -31,7 +32,7 @@ class MySharedPreference @Inject constructor(@ApplicationContext val context: Co
     }
 
     fun setBoolean( key: String?, value: Boolean) {
-        sharedPreferences.edit().putBoolean(key, value).apply()
+        sharedPreferences.edit { putBoolean(key, value) }
     }
 
     fun getBoolean( key: String?): Boolean {
@@ -39,7 +40,7 @@ class MySharedPreference @Inject constructor(@ApplicationContext val context: Co
     }
 
     fun setFloat( key: String?, value: Float) {
-        sharedPreferences.edit().putFloat(key, value).apply()
+        sharedPreferences.edit { putFloat(key, value) }
     }
 
     fun getFloat( key: String?): Float {
@@ -47,7 +48,7 @@ class MySharedPreference @Inject constructor(@ApplicationContext val context: Co
     }
 
     fun clearSharedPreference() {
-         sharedPreferences.edit().clear().apply()
+         sharedPreferences.edit { clear() }
     }
 
 }

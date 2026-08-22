@@ -35,4 +35,7 @@ interface QueryDAO {
     @Query("DELETE FROM $UserTable")
     suspend fun clearDb(): Int
 
+    @Query("DELETE FROM $LocationTable WHERE id = :id")
+    suspend fun deleteLocationById(id: Int): Int
+
 }

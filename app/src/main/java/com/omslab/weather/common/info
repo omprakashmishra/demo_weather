@@ -36,3 +36,32 @@
           ┌────┴────┐
           ▼         ▼
        Room      Retrofit
+
+
+       com.omslab.weather
+       │
+       ├── data
+       │   ├── dbcall
+       │   │   ├── local
+       │   │   └── remote
+       │   │       ├── ApiService.kt
+       │   │       ├── FastApiService.kt
+       │   │       └── model
+       │   │
+       │   └── repository
+       │
+       ├── domain
+       │   ├── model
+       │   ├── repository
+       │   └── usecase
+       │
+       ├── presentation
+       │   ├── ...
+       │
+       ├── common
+       │   └── util
+       │       └── Constants.kt
+       │
+       └── di
+           ├── NetworkModule.kt
+           └── NetworkQualifiers.kt

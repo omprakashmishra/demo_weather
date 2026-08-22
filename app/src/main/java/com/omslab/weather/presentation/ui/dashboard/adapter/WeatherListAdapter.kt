@@ -2,53 +2,93 @@ package com.omslab.weather.presentation.ui.dashboard.adapter
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.omslab.weather.R
-import com.omslab.weather.databinding.WeatherItemBinding
 import com.omslab.weather.data.models.UserLocationTableModel
+import com.omslab.weather.databinding.WeatherItemBinding
 
-class WeatherListAdapter : RecyclerView.Adapter<WeatherListAdapter.MyViewHolder>() {
+class WeatherListAdapter(
+    private val onDeleteClick: (Int) -> Unit
+) : RecyclerView.Adapter<WeatherListAdapter.MyViewHolder>() {
 
-    var list: List<UserLocationTableModel>? = null
+    private var list: List<UserLocationTableModel> = emptyList()
 
     fun updateData(items: List<UserLocationTableModel>) {
-        this.list = items
+        list = items
+        notifyDataSetChanged()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        val binding = WeatherItemBinding.inflate(inflater, parent, false)
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): MyViewHolder {
+
+        val binding = WeatherItemBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
+
         return MyViewHolder(binding)
     }
 
     @SuppressLint("SetTextI18n")
-    override fun onBindViewHolder(holder: MyViewHolder, pos: Int) {
+    override fun onBindViewHolder(
+        holder: MyViewHolder,
+        position: Int
+    ) {
+
+        val location = list[position]
+
         holder.binding.apply {
-            if (list!![pos].icon.contains("d")) {
+
+            if (location.icon.contains("d")) {
                 ivWeatherSun.setImageResource(R.drawable.sunshine)
             } else {
                 ivWeatherSun.setImageResource(R.drawable.night_ic)
             }
-            tvTemperature.text = "Temperature: ${list!![pos].temperature}°C"
-            tvDescription.text = "Description: ${list!![pos].description}"
-            tvCountry.text = "Country: ${list!![pos].country}"
-            tvCity.text = "City: ${list!![pos].cityName}"
-            tvSunset.text = "Sunset: ${list!![pos].sunset}"
-            tvSunrise.text = "Sunrise: ${list!![pos].sunrise}"
-            tvUpdateDateTime.text = list!![pos].entryDateTime
+
+            tvTemperature.text =
+                "Temperature: ${location.temperature}°C"
+
+            tvDescription.text =
+                "Description: ${location.description}"
+
+            tvCountry.text =
+                "Country: ${location.country}"
+
+            tvCity.text =
+                "City: ${location.cityName}"
+
+            tvSunset.text =
+                "Sunset: ${location.sunset}"
+
+            tvSunrise.text =
+                "Sunrise: ${location.sunrise}"
+
+            tvUpdateDateTime.text =
+                location.entryDateTime
+
+            // Delete icon
+            ivAction.setImageResource(R.drawable.remove)
+            //ivAction.visibility = View.VISIBLE
+
+            ivAction.setOnClickListener {
+                if (location.id == null)
+                    return@setOnClickListener
+                onDeleteClick(location.id!!)
+                notifyItemRemoved(position)
+            }
         }
     }
 
     override fun getItemCount(): Int {
-        return if (list == null) 0 else list!!.size
+        return list.size
     }
 
-    class MyViewHolder(itemView: WeatherItemBinding) : RecyclerView.ViewHolder(itemView.root) {
-        var binding: WeatherItemBinding
-
-        init {
-            binding = itemView
-        }
-    }
+    class MyViewHolder(
+        val binding: WeatherItemBinding
+    ) : RecyclerView.ViewHolder(binding.root)
 }

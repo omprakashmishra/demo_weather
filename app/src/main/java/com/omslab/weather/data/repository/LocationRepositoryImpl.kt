@@ -29,4 +29,11 @@ class LocationRepositoryImpl @Inject constructor(
     override suspend fun deleteOldLocations(email: String) {
         localDataSource.deleteOldLocations(email)
     }
+
+    override suspend fun deleteListLocation(id: Int) {
+        // Implement the logic to delete a specific location by its ID
+        // This method should be implemented in the local data source and called here
+        // For example:
+         localDataSource.deleteLocationById(id)
+    }
 }

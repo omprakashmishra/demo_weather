@@ -9,4 +9,5 @@ interface ILocationRepository {
     fun getStoredLocations(email: String): Flow<List<Location>>
     suspend fun updateLocation(location: Location)
     suspend fun deleteOldLocations(email: String)
+    suspend fun deleteListLocation(id: Int)
 }

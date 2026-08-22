@@ -8,17 +8,8 @@ import javax.inject.Inject
 class LocationUseCase @Inject constructor(
     private val repository: ILocationRepository
 ) {
-    private var tempLat: String? = null
-    private var tempLon: String? = null
+
     suspend fun saveLocation(location: Location): Boolean {
-
-        if (tempLat == location.lat && tempLon == location.lon) {
-            return false // already same location
-        }
-
-        tempLat = location.lat
-        tempLon = location.lon
-
         repository.saveLocation(location)
         return true
     }
@@ -37,5 +28,9 @@ class LocationUseCase @Inject constructor(
 
     suspend fun deleteOldLocations(email: String) {
         repository.deleteOldLocations(email)
+    }
+
+    suspend fun deleteListLocation(id: Int) {
+        repository.deleteListLocation(id)
     }
 }

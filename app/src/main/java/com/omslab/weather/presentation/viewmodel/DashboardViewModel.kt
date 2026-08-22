@@ -1,5 +1,6 @@
 package com.omslab.weather.presentation.viewmodel
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -25,6 +26,8 @@ class DashboardViewModel @Inject constructor(
     private val getWeatherUseCase: GetWeatherUseCase,
     private val locationUseCase: LocationUseCase
 ) : ViewModel() {
+
+    private lateinit var saved_weather: Weather
 
     private val _weatherState = MutableLiveData<WeatherState>()
     val weatherState: LiveData<WeatherState> get() = _weatherState
@@ -77,7 +80,7 @@ class DashboardViewModel @Inject constructor(
         }
     }
 
-    fun fetchWeather(lat: String, lon: String) {
+    fun fetchWeather(lat: String, lon: String, isSaved: Boolean = false) {
         if (lat.isEmpty() || lon.isEmpty()) {
             _weatherState.postValue(WeatherState.Error("Latitude or Longitude is empty"))
             return
@@ -90,21 +93,7 @@ class DashboardViewModel @Inject constructor(
             result.fold(
                 onSuccess = { weather ->
                     _currentWeather.postValue(weather)
-                    _weatherState.postValue(WeatherState.Success(weather))
-
-                    val location = Location(
-                        lat = lat,
-                        lon = lon,
-                        cityName = weather.cityName,
-                        country = weather.country,
-                        temperature = weather.temperature.toString(),
-                        description = weather.weatherDescription,
-                        icon = weather.weatherIcon,
-                        sunrise = utcFormatted(weather.sunrise, Constants.timeAm),
-                        sunset = utcFormatted(weather.sunset, Constants.timeAm),
-                        entryDateTime = utcFormatted(weather.timestamp, Constants.dateTimeAm)
-                    )
-                    saveLocation(location)
+                    saved_weather=weather
                 },
                 onFailure = { error ->
                     _weatherState.postValue(WeatherState.Error(error.message ?: "Unknown error occurred"))
@@ -113,19 +102,24 @@ class DashboardViewModel @Inject constructor(
         }
     }
 
-    fun saveLocation(location: Location) {
-        viewModelScope.launch {
-            try {
-                val saved = locationUseCase.saveLocation(location)
-                if (!saved) {
-                    _locationState.postValue(LocationState.Error("Location already exists"))
-                }
-            } catch (e: Exception) {
-                _locationState.postValue(
-                    LocationState.Error("Failed to save location")
-                )
-            }
-        }
+    @SuppressLint("SuspiciousIndentation")
+    suspend fun saveLocation() {
+        val location = Location(
+            lat = saved_weather.lat.toString(),
+            lon = saved_weather.lon.toString(),
+            cityName = saved_weather.cityName,
+            country = saved_weather.country,
+            temperature = saved_weather.temperature.toString(),
+            description = saved_weather.weatherDescription,
+            icon = saved_weather.weatherIcon,
+            sunrise = utcFormatted(saved_weather.sunrise, Constants.timeAm),
+            sunset = utcFormatted(saved_weather.sunset, Constants.timeAm),
+            entryDateTime = utcFormatted(saved_weather.timestamp, Constants.dateTimeAm)
+        )
+            sharedPref.setString(Constants.UpdatedLat, location.lat)
+            sharedPref.setString(Constants.UpdatedLong, location.lon)
+            _weatherState.postValue(WeatherState.Success(saved_weather))
+            locationUseCase.saveLocation(location)
     }
 
     fun deleteOldLocations() {
@@ -133,6 +127,16 @@ class DashboardViewModel @Inject constructor(
             try {
                 val email = sharedPref.getString(Constants.PrimaryEmail)
                 locationUseCase.deleteOldLocations(email ?: "")
+            } catch (e: Exception) {
+                _locationState.postValue(LocationState.Error("Failed to delete old locations"))
+            }
+        }
+    }
+
+    fun deleteListLocation(id: Int) {
+        viewModelScope.launch {
+            try {
+                locationUseCase.deleteListLocation(id)
             } catch (e: Exception) {
                 _locationState.postValue(LocationState.Error("Failed to delete old locations"))
             }
@@ -149,8 +153,6 @@ class DashboardViewModel @Inject constructor(
             return
         }
         fetchWeather(lat, lon)
-         sharedPref.setString(Constants.UpdatedLat, lat)
-        sharedPref.setString(Constants.UpdatedLong, lon)
     }
 
     fun utcFormatted(time: Long, pattern: String): String? {

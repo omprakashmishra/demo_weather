@@ -1,6 +1,7 @@
 package com.omslab.weather.domain.models
 
 data class Location(
+    val id: Int? = null,
     val lat: String,
     val lon: String,
     val cityName: String? = null,

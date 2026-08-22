@@ -8,11 +8,13 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.omslab.weather.R
 import com.omslab.weather.databinding.FragmentCurrentWeatherBinding
 import com.omslab.weather.presentation.viewmodel.DashboardViewModel
 import com.omslab.weather.common.util.Constants
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class CurrentWeatherFm : Fragment() {
@@ -35,6 +37,17 @@ class CurrentWeatherFm : Fragment() {
         showWelcomeMessage()
     }
 
+    private fun saveLocation() {
+        binding?.container?.ivAction?.setImageResource(R.drawable.outline_add_location)
+        binding?.container?.ivAction?.setOnClickListener {
+            lifecycleScope.launch {
+                viewModel.saveLocation()
+            }
+            Toast.makeText(activity, "Location saved successfully", Toast.LENGTH_LONG).show()
+        }
+        binding?.container?.ivAction?.visibility = View.VISIBLE
+    }
+
     private fun showWelcomeMessage() {
         val email = viewModel.sharedPref.getString(Constants.PrimaryEmail)
         Toast.makeText(activity, "WELCOME - $email", Toast.LENGTH_LONG).show()
@@ -45,6 +58,7 @@ class CurrentWeatherFm : Fragment() {
         viewModel.currentWeather.observe(viewLifecycleOwner) { weather ->
             weather?.let {
                 binding?.container?.apply {
+                    saveLocation()
                     if (it.weatherIcon.contains("d")) {
                         ivWeatherSun.setImageResource(R.drawable.sunshine)
                     } else {

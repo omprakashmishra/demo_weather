@@ -5,13 +5,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.omslab.weather.common.util.Constants
+import com.omslab.weather.data.models.UserLocationTableModel
 import com.omslab.weather.databinding.FragmentListWeatherBinding
 import com.omslab.weather.presentation.viewmodel.DashboardViewModel
 import com.omslab.weather.presentation.ui.dashboard.adapter.WeatherListAdapter
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ListWeatherFm : Fragment() {
@@ -36,7 +40,14 @@ class ListWeatherFm : Fragment() {
     }
 
     private fun initRecyclerView() {
-        listAdapter = WeatherListAdapter()
+        listAdapter = WeatherListAdapter { id ->
+            viewModel.deleteListLocation(id)
+            Toast.makeText(
+                requireContext(),
+                "Location deleted successfully",
+                Toast.LENGTH_LONG
+            ).show()
+        }
         binding?.rvItems?.adapter = listAdapter
     }
 
@@ -46,7 +57,7 @@ class ListWeatherFm : Fragment() {
             if (result != null && result.isNotEmpty()) {
                 // Convert Location list to UserLocationTableModel list for adapter
                 val locationModels = result.map { location ->
-                    com.omslab.weather.data.models.UserLocationTableModel(
+                    UserLocationTableModel(
                         lat = location.lat,
                         lon = location.lon,
                         cityName = location.cityName ?: "",

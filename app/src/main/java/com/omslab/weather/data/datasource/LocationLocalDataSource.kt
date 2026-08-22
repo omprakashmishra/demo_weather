@@ -17,6 +17,10 @@ class LocationLocalDataSource @Inject constructor(
     suspend fun deleteOldLocations(email: String) {
         dao.deleteOldLocations(email)
     }
+
+    suspend fun deleteLocationById(id: Int) {
+        dao.deleteLocationById(id)
+    }
     suspend fun saveLocation(location: Location) {
         sharedPref.setString(Constants.UpdatedLat, location.lat)
         sharedPref.setString(Constants.UpdatedLong, location.lon)

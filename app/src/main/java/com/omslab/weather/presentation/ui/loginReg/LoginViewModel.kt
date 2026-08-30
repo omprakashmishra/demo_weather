@@ -1,4 +1,4 @@
-package com.omslab.weather.presentation.viewmodel
+package com.omslab.weather.presentation.ui.loginReg
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.omslab.weather.common.MySharedPreference
 import com.omslab.weather.common.util.Constants
-import com.omslab.weather.domain.models.User
+import com.omslab.weather.data.models.TableModel
 import com.omslab.weather.domain.usecase.user.UserUseCase
 import com.omslab.weather.domain.usecase.user.ValidateInputUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,8 +20,8 @@ class LoginViewModel @Inject constructor(
     private val validateInputUseCase: ValidateInputUseCase
 ) : ViewModel() {
 
-    private val _userList = MutableLiveData<List<User>>()
-    val userList: LiveData<List<User>> get() = _userList
+    private val _userList = MutableLiveData<List<TableModel>>()
+    val userList: LiveData<List<TableModel>> get() = _userList
 
     private val _isRegister = MutableLiveData<Boolean>()
     val isRegister: LiveData<Boolean> get() = _isRegister
@@ -57,11 +57,11 @@ class LoginViewModel @Inject constructor(
             return
         }
 
-        val user = User(name = name, email = email, password = pass)
+        val user = TableModel(name = name, email = email, password = pass)
         registerUser(user)
     }
 
-    private fun registerUser(user: User) = viewModelScope.launch {
+    private fun registerUser(user: TableModel) = viewModelScope.launch {
         val result = userUseCase.registerUser(user)
         result.fold(
             onSuccess = { userId ->

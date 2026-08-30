@@ -14,7 +14,6 @@ import androidx.core.content.ContextCompat
 import com.omslab.weather.databinding.ActivityDashboardBinding
 import com.omslab.weather.presentation.ui.dashboard.adapter.DashboardPagerAdapter
 import com.omslab.weather.presentation.ui.loginReg.LoginAc
-import com.omslab.weather.presentation.viewmodel.DashboardViewModel
 import com.omslab.weather.common.util.Constants.PERMISSION_REQUEST_ACCESS_FINE_LOCATION
 import dagger.hilt.android.AndroidEntryPoint
 

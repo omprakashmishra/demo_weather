@@ -11,7 +11,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.omslab.weather.R
 import com.omslab.weather.databinding.FragmentCurrentWeatherBinding
-import com.omslab.weather.presentation.viewmodel.DashboardViewModel
+import com.omslab.weather.presentation.ui.dashboard.DashboardViewModel
 import com.omslab.weather.common.util.Constants
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

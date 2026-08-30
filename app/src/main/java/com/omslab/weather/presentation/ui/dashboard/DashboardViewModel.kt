@@ -1,4 +1,4 @@
-package com.omslab.weather.presentation.viewmodel
+package com.omslab.weather.presentation.ui.dashboard
 
 import android.annotation.SuppressLint
 import androidx.lifecycle.LiveData
@@ -7,8 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.omslab.weather.common.MySharedPreference
 import com.omslab.weather.common.util.Constants
-import com.omslab.weather.domain.models.Location
-import com.omslab.weather.domain.models.Weather
+import com.omslab.weather.data.models.UserLocationTableModel
+import com.omslab.weather.data.models.WeatherModel
 import com.omslab.weather.domain.usecase.location.LocationUseCase
 import com.omslab.weather.domain.usecase.weather.GetWeatherUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,7 +27,7 @@ class DashboardViewModel @Inject constructor(
     private val locationUseCase: LocationUseCase
 ) : ViewModel() {
 
-    private lateinit var saved_weather: Weather
+    private lateinit var saved_weather: WeatherModel
 
     private val _weatherState = MutableLiveData<WeatherState>()
     val weatherState: LiveData<WeatherState> get() = _weatherState
@@ -35,11 +35,11 @@ class DashboardViewModel @Inject constructor(
     private val _locationState = MutableLiveData<LocationState>()
     val locationState: LiveData<LocationState> get() = _locationState
 
-    private val _weatherList = MutableLiveData<List<Location>>()
-    val weatherList: LiveData<List<Location>> get() = _weatherList
+    private val _weatherList = MutableLiveData<List<UserLocationTableModel>>()
+    val weatherList: LiveData<List<UserLocationTableModel>> get() = _weatherList
 
-    private val _currentWeather = MutableLiveData<Weather?>()
-    val currentWeather: LiveData<Weather?> get() = _currentWeather
+    private val _currentWeather = MutableLiveData<WeatherModel?>()
+    val currentWeather: LiveData<WeatherModel?> get() = _currentWeather
 
     init {
         loadStoredLocations()
@@ -60,8 +60,8 @@ class DashboardViewModel @Inject constructor(
                     if (locations.isEmpty()) {
                         loadLocationFromPreferences()
                     }else{
-                        val firstLocation = locations.firstOrNull()
-                        firstLocation?.let {
+                        val firstUserLocationTableModel = locations.firstOrNull()
+                        firstUserLocationTableModel?.let {
                             fetchWeather(it.lat, it.lon)
                         }
                     }
@@ -104,17 +104,17 @@ class DashboardViewModel @Inject constructor(
 
     @SuppressLint("SuspiciousIndentation")
     suspend fun saveLocation() {
-        val location = Location(
-            lat = saved_weather.lat.toString(),
-            lon = saved_weather.lon.toString(),
+        val location = UserLocationTableModel(
+            lat = saved_weather.latitude.toString(),
+            lon = saved_weather.longitude.toString(),
             cityName = saved_weather.cityName,
             country = saved_weather.country,
             temperature = saved_weather.temperature.toString(),
             description = saved_weather.weatherDescription,
             icon = saved_weather.weatherIcon,
-            sunrise = utcFormatted(saved_weather.sunrise, Constants.timeAm),
-            sunset = utcFormatted(saved_weather.sunset, Constants.timeAm),
-            entryDateTime = utcFormatted(saved_weather.timestamp, Constants.dateTimeAm)
+            sunrise = utcFormatted(saved_weather.sunrise, Constants.timeAm).toString(),
+            sunset = utcFormatted(saved_weather.sunset, Constants.timeAm).toString(),
+            entryDateTime = utcFormatted(saved_weather.timestamp, Constants.dateTimeAm).toString()
         )
             sharedPref.setString(Constants.UpdatedLat, location.lat)
             sharedPref.setString(Constants.UpdatedLong, location.lon)
@@ -165,7 +165,7 @@ class DashboardViewModel @Inject constructor(
 
     sealed class WeatherState {
         object Loading : WeatherState()
-        data class Success(val weather: Weather) : WeatherState()
+        data class Success(val weather: WeatherModel) : WeatherState()
         data class Error(val message: String) : WeatherState()
     }
 

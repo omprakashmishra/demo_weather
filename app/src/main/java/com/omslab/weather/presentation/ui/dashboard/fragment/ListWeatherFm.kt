@@ -8,14 +8,10 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
-import com.omslab.weather.common.util.Constants
-import com.omslab.weather.data.models.UserLocationTableModel
 import com.omslab.weather.databinding.FragmentListWeatherBinding
-import com.omslab.weather.presentation.viewmodel.DashboardViewModel
+import com.omslab.weather.presentation.ui.dashboard.DashboardViewModel
 import com.omslab.weather.presentation.ui.dashboard.adapter.WeatherListAdapter
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ListWeatherFm : Fragment() {
@@ -55,23 +51,7 @@ class ListWeatherFm : Fragment() {
     private fun bindObservers() {
         viewModel.weatherList.observe(viewLifecycleOwner) { result ->
             if (result != null && result.isNotEmpty()) {
-                // Convert Location list to UserLocationTableModel list for adapter
-                val locationModels = result.map { location ->
-                    UserLocationTableModel(
-                        lat = location.lat,
-                        lon = location.lon,
-                        cityName = location.cityName ?: "",
-                        country = location.country ?: "",
-                        temperature = location.temperature ?: "",
-                        description = location.description ?: "",
-                        icon = location.icon ?: "",
-                        sunrise = location.sunrise ?: "",
-                        sunset = location.sunset ?: "",
-                        entryDateTime = location.entryDateTime ?: "",
-                        email = viewModel.sharedPref.getString(Constants.PrimaryEmail) ?: ""
-                    )
-                }
-                listAdapter.updateData(locationModels)
+                listAdapter.updateData(result)
                 listAdapter.notifyDataSetChanged()
                 binding?.tvSize?.text = "Total : ${result.size}"
             } else {

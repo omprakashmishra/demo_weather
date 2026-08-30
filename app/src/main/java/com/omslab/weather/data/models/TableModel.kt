@@ -6,19 +6,14 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.omslab.weather.common.util.Constants.UserTable
 
-@Entity(tableName = UserTable , indices = [Index(value = ["email"], unique = true)])
+@Entity(tableName = UserTable, indices = [Index(value = ["email"], unique = true)])
 data class TableModel(
     var name: String,
     @ColumnInfo(name = "email")
     var email: String,
-    var password:String
-    ){
-
+    var password: String
+) {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
-    var Id: Int? = null
+    var id: Int? = null
 }
-
-
-
-

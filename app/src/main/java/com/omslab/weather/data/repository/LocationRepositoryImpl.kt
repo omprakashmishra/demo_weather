@@ -1,36 +1,35 @@
 package com.omslab.weather.data.repository
 
 import com.omslab.weather.data.datasource.LocationLocalDataSource
-import com.omslab.weather.domain.models.Location
-import com.omslab.weather.domain.repository.ILocationRepository
+import com.omslab.weather.data.models.UserLocationTableModel
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class LocationRepositoryImpl @Inject constructor(
     private val localDataSource: LocationLocalDataSource
-) : ILocationRepository {
+) {
 
-    override suspend fun saveLocation(location: Location) {
+    suspend fun saveLocation(location: UserLocationTableModel) {
         localDataSource.saveLocation(location)
     }
 
-    override suspend fun getCurrentLocation(): Location? {
+    suspend fun getCurrentLocation(): UserLocationTableModel? {
         return localDataSource.getCurrentLocation()
     }
 
-    override fun getStoredLocations(email: String): Flow<List<Location>> {
+    fun getStoredLocations(email: String): Flow<List<UserLocationTableModel>> {
         return localDataSource.getStoredLocations(email)
     }
 
-    override suspend fun updateLocation(location: Location) {
+    suspend fun updateLocation(location: UserLocationTableModel) {
         localDataSource.updateLocation(location)
     }
 
-    override suspend fun deleteOldLocations(email: String) {
+    suspend fun deleteOldLocations(email: String) {
         localDataSource.deleteOldLocations(email)
     }
 
-    override suspend fun deleteListLocation(id: Int) {
+    suspend fun deleteListLocation(id: Int) {
         // Implement the logic to delete a specific location by its ID
         // This method should be implemented in the local data source and called here
         // For example:

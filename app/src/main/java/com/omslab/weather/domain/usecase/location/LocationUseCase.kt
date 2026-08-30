@@ -1,28 +1,24 @@
 package com.omslab.weather.domain.usecase.location
 
-import com.omslab.weather.domain.models.Location
-import com.omslab.weather.domain.repository.ILocationRepository
+import com.omslab.weather.data.models.UserLocationTableModel
+import com.omslab.weather.data.repository.LocationRepositoryImpl
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class LocationUseCase @Inject constructor(
-    private val repository: ILocationRepository
+    private val repository: LocationRepositoryImpl
 ) {
-
-    suspend fun saveLocation(location: Location): Boolean {
+    suspend fun saveLocation(location: UserLocationTableModel): Boolean {
         repository.saveLocation(location)
         return true
     }
 
-    suspend fun getCurrentLocation(): Location? {
-        return repository.getCurrentLocation()
-    }
+    suspend fun getCurrentLocation(): UserLocationTableModel? = repository.getCurrentLocation()
 
-    fun getStoredLocations(email: String): Flow<List<Location>> {
-        return repository.getStoredLocations(email)
-    }
+    fun getStoredLocations(email: String): Flow<List<UserLocationTableModel>> =
+        repository.getStoredLocations(email)
 
-    suspend fun updateLocation(location: Location) {
+    suspend fun updateLocation(location: UserLocationTableModel) {
         repository.updateLocation(location)
     }
 

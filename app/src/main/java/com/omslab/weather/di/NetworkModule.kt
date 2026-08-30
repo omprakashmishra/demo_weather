@@ -3,7 +3,7 @@ package com.omslab.weather.di
 import android.util.Log
 import com.omslab.weather.common.util.Constants
 import com.omslab.weather.data.dbcall.remote.ApiService
-import com.omslab.weather.data.dbcall.remote.FastApiService
+import com.omslab.weather.data.dbcall.remote.FastApiWeatherService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -84,6 +84,6 @@ object NetworkModule {
     @Singleton
     fun provideFastApiService(
         @FastApiRetrofit retrofit: Retrofit
-    ): FastApiService =
-        retrofit.create(FastApiService::class.java)
+    ): FastApiWeatherService =
+        retrofit.create(FastApiWeatherService::class.java)
 }

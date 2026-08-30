@@ -8,7 +8,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.omslab.weather.databinding.ActivityRegisterBinding
 import com.omslab.weather.presentation.ui.dashboard.ActivityDashboard
-import com.omslab.weather.presentation.viewmodel.LoginViewModel
 import com.omslab.weather.common.util.Constants
 import dagger.hilt.android.AndroidEntryPoint
 

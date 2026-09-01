@@ -1,4 +1,4 @@
-package com.omslab.weather.presentation.ui.loginReg
+package com.omslab.weather.presentation.loginReg
 
 import android.content.Context
 import android.content.Intent
@@ -7,7 +7,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.omslab.weather.databinding.ActivityLoginBinding
-import com.omslab.weather.presentation.ui.dashboard.ActivityDashboard
+import com.omslab.weather.presentation.dashboard.ActivityDashboard
 import com.omslab.weather.common.util.Constants.PrimaryEmail
 import dagger.hilt.android.AndroidEntryPoint
 

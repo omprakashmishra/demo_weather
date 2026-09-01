@@ -2,9 +2,8 @@ package com.omslab.weather.data.datasource
 
 import com.omslab.weather.common.MySharedPreference
 import com.omslab.weather.common.util.Constants
-import com.omslab.weather.data.dbcall.local.QueryDAO
+import com.omslab.weather.data.dbcall.localQuery.QueryDAO
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class LocationLocalDataSource @Inject constructor(

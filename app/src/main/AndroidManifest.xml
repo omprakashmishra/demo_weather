@@ -16,7 +16,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WeatherSample"
         tools:targetApi="31">
-
         <activity
             android:name=".presentation.ui.SplashAc"
             android:exported="true"
@@ -28,17 +27,21 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".presentation.ui.loginReg.LoginAc"
+            android:name=".presentation.loginReg.LoginAc"
             android:exported="true"
             android:theme="@style/Theme.WeatherSample.NoActionBar" />
         <activity
-            android:name=".presentation.ui.loginReg.RegisterAc"
+            android:name=".presentation.loginReg.RegisterAc"
             android:exported="true"
             android:theme="@style/Theme.WeatherSample.NoActionBar" />
         <activity
-            android:name=".presentation.ui.dashboard.ActivityDashboard"
+            android:name=".presentation.dashboard.ActivityDashboard"
             android:exported="true"
             android:theme="@style/Theme.WeatherSample.NoActionBar" />
+        <activity
+            android:name=".presentation.fastApiLlm.FastApiWeatherActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

@@ -2,8 +2,8 @@ package com.omslab.weather.di
 
 import android.util.Log
 import com.omslab.weather.common.util.Constants
-import com.omslab.weather.data.dbcall.remote.ApiService
-import com.omslab.weather.data.dbcall.remote.FastApiWeatherService
+import com.omslab.weather.data.dbcall.remoteQuery.GetWeatherGQuery
+import com.omslab.weather.data.dbcall.remoteQuery.FastApiWeatherServiceQuery
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -74,8 +74,8 @@ object NetworkModule {
     @Singleton
     fun provideWeatherApiService(
         @WeatherRetrofit retrofit: Retrofit
-    ): ApiService =
-        retrofit.create(ApiService::class.java)
+    ): GetWeatherGQuery =
+        retrofit.create(GetWeatherGQuery::class.java)
 
     /**
      * FastAPI service
@@ -84,6 +84,6 @@ object NetworkModule {
     @Singleton
     fun provideFastApiService(
         @FastApiRetrofit retrofit: Retrofit
-    ): FastApiWeatherService =
-        retrofit.create(FastApiWeatherService::class.java)
+    ): FastApiWeatherServiceQuery =
+        retrofit.create(FastApiWeatherServiceQuery::class.java)
 }

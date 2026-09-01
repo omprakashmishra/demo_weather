@@ -1,12 +1,12 @@
-package com.omslab.weather.presentation.ui.dashboard.adapter
+package com.omslab.weather.presentation.dashboard.adapter
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import com.omslab.weather.R
-import com.omslab.weather.presentation.ui.dashboard.fragment.CurrentWeatherFm
-import com.omslab.weather.presentation.ui.dashboard.fragment.ListWeatherFm
+import com.omslab.weather.presentation.dashboard.fragment.CurrentWeatherFm
+import com.omslab.weather.presentation.dashboard.fragment.ListWeatherFm
 
 class DashboardPagerAdapter (context: FragmentActivity,fm: FragmentManager):
     FragmentStatePagerAdapter(fm) {

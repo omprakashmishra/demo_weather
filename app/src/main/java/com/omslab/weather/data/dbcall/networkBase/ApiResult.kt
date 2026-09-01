@@ -1,4 +1,4 @@
-package com.omslab.weather.data.dbcall.network
+package com.omslab.weather.data.dbcall.networkBase
 
 sealed class ApiResult<out T> {
 

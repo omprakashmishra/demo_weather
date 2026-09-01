@@ -1,4 +1,4 @@
-package com.omslab.weather.presentation.ui.dashboard.adapter
+package com.omslab.weather.presentation.dashboard.adapter
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater

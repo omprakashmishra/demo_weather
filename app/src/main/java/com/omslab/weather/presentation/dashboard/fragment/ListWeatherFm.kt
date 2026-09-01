@@ -1,4 +1,4 @@
-package com.omslab.weather.presentation.ui.dashboard.fragment
+package com.omslab.weather.presentation.dashboard.fragment
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -9,8 +9,8 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.omslab.weather.databinding.FragmentListWeatherBinding
-import com.omslab.weather.presentation.ui.dashboard.DashboardViewModel
-import com.omslab.weather.presentation.ui.dashboard.adapter.WeatherListAdapter
+import com.omslab.weather.presentation.dashboard.DashboardViewModel
+import com.omslab.weather.presentation.dashboard.adapter.WeatherListAdapter
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

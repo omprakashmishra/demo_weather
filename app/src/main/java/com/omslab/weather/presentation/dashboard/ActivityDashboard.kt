@@ -1,4 +1,4 @@
-package com.omslab.weather.presentation.ui.dashboard
+package com.omslab.weather.presentation.dashboard
 
 import android.Manifest
 import android.content.Intent
@@ -12,8 +12,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.omslab.weather.databinding.ActivityDashboardBinding
-import com.omslab.weather.presentation.ui.dashboard.adapter.DashboardPagerAdapter
-import com.omslab.weather.presentation.ui.loginReg.LoginAc
+import com.omslab.weather.presentation.dashboard.adapter.DashboardPagerAdapter
+import com.omslab.weather.presentation.loginReg.LoginAc
 import com.omslab.weather.common.util.Constants.PERMISSION_REQUEST_ACCESS_FINE_LOCATION
 import dagger.hilt.android.AndroidEntryPoint
 

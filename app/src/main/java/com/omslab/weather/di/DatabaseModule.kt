@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.room.Room
 import com.omslab.weather.common.MySharedPreference
 import com.omslab.weather.common.util.Constants
-import com.omslab.weather.data.dbcall.local.InitDataBase
-import com.omslab.weather.data.dbcall.local.QueryDAO
+import com.omslab.weather.data.dbcall.localQuery.InitDataBase
+import com.omslab.weather.data.dbcall.localQuery.QueryDAO
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

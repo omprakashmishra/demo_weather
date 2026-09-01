@@ -1,12 +1,12 @@
 // ApiService.kt
-package com.omslab.weather.data.dbcall.remote
+package com.omslab.weather.data.dbcall.remoteQuery
 
 import com.omslab.weather.data.models.WeatherModel
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-interface ApiService {
+interface GetWeatherGQuery {
     @GET("weather")
     suspend fun getWeatherByLocation(
         @Query("units") unit: String,

@@ -1,4 +1,4 @@
-package com.omslab.weather.presentation.ui.loginReg
+package com.omslab.weather.presentation.loginReg
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

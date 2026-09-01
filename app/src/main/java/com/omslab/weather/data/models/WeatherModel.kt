@@ -11,8 +11,6 @@ data class WeatherModel(
     @SerializedName("base")
     val base: String? = null,
 
-    @SerializedName("clouds")
-    val clouds: CloudsModel? = null,
 
     @SerializedName("cod")
     val cod: Int? = null,
@@ -32,8 +30,6 @@ data class WeatherModel(
     @SerializedName("name")
     val name: String? = null,
 
-    @SerializedName("snow")
-    val snow: SnowModel? = null,
 
     @SerializedName("sys")
     val sys: SysModel? = null,
@@ -46,9 +42,6 @@ data class WeatherModel(
 
     @SerializedName("weather")
     val weather: List<WeatherConditionModel>? = null,
-
-    @SerializedName("wind")
-    val wind: WindModel? = null,
 
     // Request fields (for building requests)
     @SerializedName("units")
@@ -72,13 +65,10 @@ data class WeatherModel(
     @SerializedName("condition")
     val condition: String? = null
 ) {
-    // App-facing values used directly by presentation/domain use cases.
+
     val cityName: String get() = name ?: city.orEmpty()
     val temperature: Double get() = main?.temp ?: apiTemperature?.toDouble() ?: 0.0
-    val feelsLike: Double get() = main?.feelsLike ?: 0.0
-    val humidityValue: Int get() = main?.humidity ?: 0
-    val pressureValue: Int get() = main?.pressure ?: 0
-    val windSpeed: Double get() = wind?.speed ?: 0.0
+
     val weatherDescription: String get() = weather?.firstOrNull()?.description ?: condition.orEmpty()
     val weatherIcon: String get() = weather?.firstOrNull()?.icon ?: ""
     val latitude: Double get() = coord?.lat ?: lat?.toDoubleOrNull() ?: 0.0
@@ -93,22 +83,8 @@ data class WeatherModel(
         (id != null && name != null && main != null) ||
         (city != null && apiTemperature != null && condition != null)
 
-    // Helper method to create request
-    fun toRequest(units: String, lat: String, lon: String, appId: String): WeatherModel {
-        return this.copy(
-            units = units,
-            lat = lat,
-            lon = lon,
-            appId = appId
-        )
-    }
 }
 
-// Nested models
-data class CloudsModel(
-    @SerializedName("all")
-    val all: Int? = null
-)
 
 data class CoordModel(
     @SerializedName("lat")
@@ -144,11 +120,6 @@ data class MainModel(
     val tempMin: Double? = null
 )
 
-data class SnowModel(
-    @SerializedName("1h")
-    val oneHour: Double? = null
-)
-
 data class SysModel(
     @SerializedName("country")
     val country: String? = null,
@@ -178,15 +149,4 @@ data class WeatherConditionModel(
 
     @SerializedName("main")
     val main: String? = null
-)
-
-data class WindModel(
-    @SerializedName("deg")
-    val deg: Int? = null,
-
-    @SerializedName("gust")
-    val gust: Double? = null,
-
-    @SerializedName("speed")
-    val speed: Double? = null
 )

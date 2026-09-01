@@ -1,4 +1,4 @@
-package com.omslab.weather.data.dbcall.local
+package com.omslab.weather.data.dbcall.localQuery
 import androidx.room.*
 import androidx.room.OnConflictStrategy.Companion.IGNORE
 import com.omslab.weather.data.models.TableModel

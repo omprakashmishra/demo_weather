@@ -7,7 +7,7 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import com.omslab.weather.R
 import com.omslab.weather.databinding.ActivitySplashScreenBinding
-import com.omslab.weather.presentation.ui.loginReg.LoginAc
+import com.omslab.weather.presentation.loginReg.LoginAc
 
 class SplashAc : AppCompatActivity() {
     private lateinit var binding: ActivitySplashScreenBinding

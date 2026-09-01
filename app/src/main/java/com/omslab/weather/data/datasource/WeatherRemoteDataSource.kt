@@ -2,15 +2,16 @@
 package com.omslab.weather.data.datasource
 
 import com.omslab.weather.common.util.Constants
-import com.omslab.weather.data.dbcall.remote.ApiService
+import com.omslab.weather.data.dbcall.remoteQuery.GetWeatherGQuery
+import com.omslab.weather.data.models.WeatherModel
 import javax.inject.Inject
 
 class WeatherRemoteDataSource @Inject constructor(
-    private val apiService: ApiService
+    private val getWeatherGQuery: GetWeatherGQuery
 ) {
-    suspend fun getWeather(lat: String, lon: String): Result<com.omslab.weather.data.models.WeatherModel> {
+    suspend fun getWeather(lat: String, lon: String): Result<WeatherModel> {
         return try {
-            val response = apiService.getWeatherByLocation(
+            val response = getWeatherGQuery.getWeatherByLocation(
                 unit = "metric",
                 lat = lat,
                 lon = lon,

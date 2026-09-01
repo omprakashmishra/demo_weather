@@ -1,6 +1,7 @@
-package com.omslab.weather.presentation.ui.dashboard.fragment
+package com.omslab.weather.presentation.dashboard.fragment
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,10 +12,12 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.omslab.weather.R
 import com.omslab.weather.databinding.FragmentCurrentWeatherBinding
-import com.omslab.weather.presentation.ui.dashboard.DashboardViewModel
+import com.omslab.weather.presentation.dashboard.DashboardViewModel
 import com.omslab.weather.common.util.Constants
+import com.omslab.weather.presentation.fastApiLlm.FastApiWeatherActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import kotlin.jvm.java
 
 @AndroidEntryPoint
 class CurrentWeatherFm : Fragment() {
@@ -35,6 +38,18 @@ class CurrentWeatherFm : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         bindObservers()
         showWelcomeMessage()
+        onClickView()
+    }
+
+    private fun onClickView() {
+        val weather = viewModel.currentWeather.value ?: return
+        startActivity(
+            Intent(requireContext(), FastApiWeatherActivity::class.java).apply {
+                putExtra("lat", weather.latitude)
+                putExtra("lon", weather.longitude)
+                putExtra("city", weather.cityName)
+            }
+        )
     }
 
     private fun saveLocation() {

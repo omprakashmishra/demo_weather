@@ -24,50 +24,35 @@ class FastApiWeatherRemoteDataSource @Inject constructor(
      *     condition = "Sunny"
      * )
      */
-    suspend fun getWeather(
-        request: FastApiWeatherModel
-    ): ApiResult<FastApiWeatherModel> {
-
+    suspend fun getWeather(request: FastApiWeatherModel): ApiResult<FastApiWeatherModel> {
         val city = request.city?.trim().orEmpty()
-
         if (city.isEmpty()) {
-            return ApiResult.Error(
-                message = "City cannot be empty."
-            )
+            return ApiResult.Error(message = "City cannot be empty.")
         }
-
         return try {
-
             // Request: GET /weather?city=Delhi
             val response = fastApiWeatherService
                 .getWeatherFastAPI(city)
-
             if (response.isSuccessful) {
-
                 val body = response.body()
-
                 when {
                     body == null -> {
                         ApiResult.Error(
                             message = "Empty response from weather server."
                         )
                     }
-
                     !body.isValidResponse() -> {
                         ApiResult.Error(
                             message = "Invalid response from weather server."
                         )
                     }
-
                     else -> {
                         ApiResult.Success(body)
                     }
                 }
 
             } else {
-
                 when (response.code()) {
-
                     404 -> {
                         ApiResult.Error(
                             code = 404,
@@ -76,7 +61,6 @@ class FastApiWeatherRemoteDataSource @Inject constructor(
                                 .message
                         )
                     }
-
                     in 500..599 -> {
                         ApiResult.Error(
                             code = response.code(),
@@ -85,7 +69,6 @@ class FastApiWeatherRemoteDataSource @Inject constructor(
                                 .message
                         )
                     }
-
                     else -> {
                         ApiResult.Error(
                             code = response.code(),
@@ -94,25 +77,13 @@ class FastApiWeatherRemoteDataSource @Inject constructor(
                     }
                 }
             }
-
-        } catch (_: UnknownHostException) {
-
-            ApiResult.NetworkError
-
-        } catch (_: SocketTimeoutException) {
-
-            ApiResult.Timeout
-
-        } catch (_: IOException) {
-
-            ApiResult.NetworkError
-
-        } catch (e: Exception) {
-
-            ApiResult.Error(
-                message = e.message
-                    ?: "Something went wrong. Please try again."
-            )
         }
+        catch (_: UnknownHostException) { ApiResult.NetworkError }
+        catch (_: SocketTimeoutException) { ApiResult.Timeout }
+        catch (_: IOException) { ApiResult.NetworkError }
+        catch (e: Exception) { ApiResult.Error(
+            message = e.message
+                    ?: "Something went wrong. Please try again."
+        ) }
     }
 }

@@ -1,5 +1,4 @@
-package com.omslab.weather.domain.usecase.location
-
+package com.omslab.weather.domain.usecase.fastApi
 import com.omslab.weather.data.models.FactCheckModel
 import com.omslab.weather.data.repository.FactCheckRepository
 import javax.inject.Inject

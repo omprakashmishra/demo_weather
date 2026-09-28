@@ -4,10 +4,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.omslab.weather.data.dbcall.networkBase.ApiResult
-import com.omslab.weather.data.models.FastApiWeatherModel
+import com.omslab.weather.data.models.FactCheckModel
 import com.omslab.weather.domain.usecase.location.GetWeatherFastApiUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -16,60 +18,76 @@ class FastApiWeatherViewModel @Inject constructor(
     private val getWeatherFastApiUseCase: GetWeatherFastApiUseCase
 ) : ViewModel() {
 
-    private val _state = MutableLiveData<State>()
-    val state: LiveData<State> = _state
+    private val _uiState = MutableLiveData(FactCheckUiState())
+    val uiState: LiveData<FactCheckUiState> = _uiState
 
-    fun getWeather(city: String) {
+    private val _events = MutableSharedFlow<Event>(extraBufferCapacity = 1)
+    val events: SharedFlow<Event> = _events.asSharedFlow()
 
-        val request = FastApiWeatherModel(
-            city = city
-        )
+    // ---------------- Input ----------------
 
-        _state.value = State.Loading
+    fun onInputChanged(text: String) = update { copy(input = text, error = null) }
 
-        viewModelScope.launch {
+    fun onMicToggled() = update { copy(isListening = !isListening) }
 
-            when (val result = getWeatherFastApiUseCase(request)) {
+    fun onVoiceResult(text: String) = update {
+        copy(input = text, isListening = false, error = null)
+    }
 
-                is ApiResult.Success -> {
-                    _state.value = State.Success(
-                        request = request,
-                        data = result.data
-                    )
-                }
+    fun onVoiceError(message: String) = update {
+        copy(isListening = false, error = message)
+    }
 
-                is ApiResult.Error -> {
-                    _state.value = State.Error(
-                        result.message
-                    )
-                }
+    // ---------------- Action ----------------
 
-                ApiResult.NetworkError -> {
-                    _state.value = State.Error(
-                        "No internet connection."
-                    )
-                }
+    fun onSendClicked() {
+        val state = _uiState.value ?: return
+        val query = state.input.trim()
 
-                ApiResult.Timeout -> {
-                    _state.value = State.Error(
-                        "Request timeout."
-                    )
-                }
-            }
+        when {
+            query.isBlank() -> update { copy(error = "Please enter a claim.") }
+            state.isLoading -> Unit
+            else -> submit(query)
         }
     }
 
-    sealed class State {
+    private fun submit(query: String) {
+        update {
+            copy(
+                isLoading = true,
+                error = null,
+                result = FactCheckModel()
+            )
+        }
 
-        object Loading : State()
+        viewModelScope.launch {
+            val newResult = runCatching { getWeatherFastApiUseCase(query) }
+                .getOrElse { error ->
+                    FactCheckModel.unverifiable(
+                        claim = query,
+                        reason = error.message ?: "Model returned invalid JSON."
+                    )
+                }
+                .let {
+                    it.copy(
+                        claim = it.claim.ifBlank { query },
+                        confidence = it.confidence.coerceIn(0, 100)
+                    )
+                }
 
-        data class Success(
-            val request: FastApiWeatherModel,
-            val data: FastApiWeatherModel
-        ) : State()
+            update { copy(isLoading = false, result = newResult) }
 
-        data class Error(
-            val message: String
-        ) : State()
+            if (newResult.hasResult) _events.tryEmit(Event.ClearInput)
+        }
+    }
+
+    // ---------------- Helpers ----------------
+
+    private inline fun update(block: FactCheckUiState.() -> FactCheckUiState) {
+        _uiState.value = _uiState.value?.block() ?: FactCheckUiState().block()
+    }
+
+    sealed interface Event {
+        data object ClearInput : Event
     }
 }

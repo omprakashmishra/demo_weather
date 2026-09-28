@@ -60,6 +60,7 @@ dependencies {
 
     implementation 'androidx.fragment:fragment-ktx:1.6.0-alpha06'
     implementation 'androidx.fragment:fragment:1.5.5'
+    implementation 'androidx.room:room-runtime-android:2.8.5'
 
     // --------------------------------------------------
     // Material

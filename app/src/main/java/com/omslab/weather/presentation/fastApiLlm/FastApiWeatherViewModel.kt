@@ -4,8 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.omslab.weather.data.dbcall.networkBase.ApiResult
 import com.omslab.weather.data.models.FactCheckModel
-import com.omslab.weather.domain.usecase.location.GetWeatherFastApiUseCase
+import com.omslab.weather.domain.usecase.location.FactCheckUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -15,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FastApiWeatherViewModel @Inject constructor(
-    private val getWeatherFastApiUseCase: GetWeatherFastApiUseCase
+    private val factCheckUseCase: FactCheckUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableLiveData(FactCheckUiState())
@@ -61,19 +62,24 @@ class FastApiWeatherViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            val newResult = runCatching { getWeatherFastApiUseCase(query) }
-                .getOrElse { error ->
-                    FactCheckModel.unverifiable(
-                        claim = query,
-                        reason = error.message ?: "Model returned invalid JSON."
-                    )
-                }
-                .let {
-                    it.copy(
-                        claim = it.claim.ifBlank { query },
-                        confidence = it.confidence.coerceIn(0, 100)
-                    )
-                }
+            val newResult = when (val result = factCheckUseCase(query)) {
+                is ApiResult.Success -> result.data.copy(
+                    claim = result.data.claim.ifBlank { query },
+                    confidence = result.data.confidence.coerceIn(0, 100)
+                )
+                is ApiResult.Error -> FactCheckModel.unverifiable(
+                    claim = query,
+                    reason = result.message
+                )
+                ApiResult.NetworkError -> FactCheckModel.unverifiable(
+                    claim = query,
+                    reason = "No internet connection."
+                )
+                ApiResult.Timeout -> FactCheckModel.unverifiable(
+                    claim = query,
+                    reason = "Request timed out. Please try again."
+                )
+            }
 
             update { copy(isLoading = false, result = newResult) }
 

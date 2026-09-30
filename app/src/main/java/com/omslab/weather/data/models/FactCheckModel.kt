@@ -25,6 +25,7 @@ data class FactCheckModel(
             sources = emptyList()
         )
     }
+
 }
 
 data class Source(

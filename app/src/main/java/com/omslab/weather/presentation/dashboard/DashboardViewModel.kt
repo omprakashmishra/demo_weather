@@ -27,6 +27,7 @@ class DashboardViewModel @Inject constructor(
 ) : ViewModel() {
 
     private var savedWeather: WeatherModel? = null
+    private var hasLoaded = false
 
     private val _weatherState = MutableLiveData<WeatherState>()
     val weatherState: LiveData<WeatherState> get() = _weatherState

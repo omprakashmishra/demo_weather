@@ -27,22 +27,19 @@ class DashboardViewModel @Inject constructor(
 ) : ViewModel() {
 
     private var savedWeather: WeatherModel? = null
-    private var hasLoaded = false
-
+    var hasLoaded = false
     private val _weatherState = MutableLiveData<WeatherState>()
     val weatherState: LiveData<WeatherState> get() = _weatherState
 
     private val _locationState = MutableLiveData<LocationState>()
     val locationState: LiveData<LocationState> get() = _locationState
 
-    private val _weatherList =
-        MutableLiveData<List<UserLocationTableModel>>()
+    private val _weatherList = MutableLiveData<List<UserLocationTableModel>>()
 
     val weatherList: LiveData<List<UserLocationTableModel>>
         get() = _weatherList
 
-    private val _currentWeather =
-        MutableLiveData<WeatherModel?>()
+    private val _currentWeather = MutableLiveData<WeatherModel?>()
 
     val currentWeather: LiveData<WeatherModel?>
         get() = _currentWeather
@@ -58,33 +55,19 @@ class DashboardViewModel @Inject constructor(
      * This does NOT automatically call the weather API.
      */
     private fun loadStoredLocations() {
-        val email = sharedPref.getString(Constants.PrimaryEmail)
-            ?: return
+        val email = sharedPref.getString(Constants.PrimaryEmail) ?: return
         viewModelScope.launch {
-            locationUseCase.getStoredLocations(email)
-                .catch {
-                    _locationState.postValue(
-                        LocationState.Error(
-                            "Failed to load locations"
-                        )
-                    )
+            locationUseCase.getStoredLocations(email).catch {
+                _locationState.postValue(LocationState.Error("Failed to load locations"))
+            }.collectLatest { locations ->
+                _weatherList.postValue(locations)
+                if (locations.isEmpty()) {
+                    loadLocationFromPreferences()
                 }
-                .collectLatest { locations ->
-
-                    _weatherList.postValue(locations)
-
-                    if (locations.isEmpty()) {
-                        loadLocationFromPreferences()
-                    }
-                }
+            }
         }
     }
 
-    /**
-     * Gets current latitude/longitude.
-     *
-     * Does NOT automatically call weather API.
-     */
     private fun loadLocationFromPreferences() {
         viewModelScope.launch {
             val location = locationUseCase.getCurrentLocation()
@@ -96,126 +79,53 @@ class DashboardViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Explicit weather API call.
-     *
-     * Call this only when Dashboard actually needs
-     * fresh weather data.
-     */
-    fun fetchWeather(
-        lat: String,
-        lon: String
-    ) {
-
-        if (lat.isBlank() || lon.isBlank()) {
-            _weatherState.postValue(
-                WeatherState.Error(
-                    "Latitude or Longitude is empty"
-                )
-            )
+    fun fetchWeather(lat: String, lon: String) {
+        if(!hasLoaded)
+            return
+        else if (lat.isBlank() || lon.isBlank()) {
+            _weatherState.postValue(WeatherState.Error("Latitude or Longitude is empty"))
             return
         }
-
-        _weatherState.postValue(
-            WeatherState.Loading
-        )
-
+        _weatherState.postValue(WeatherState.Loading)
         viewModelScope.launch {
-
-            val result = getWeatherUseCase(
-                lat,
-                lon
-            )
-
-            result.fold(
-
-                onSuccess = { weather ->
-
-                    savedWeather = weather
-
-                    _currentWeather.postValue(
-                        weather
+            val result = getWeatherUseCase(lat, lon)
+            result.fold(onSuccess = { weather ->
+                savedWeather = weather
+                _currentWeather.postValue(weather)
+                _weatherState.postValue(WeatherState.Success(weather))
+            }, onFailure = { error ->
+                _weatherState.postValue(
+                    WeatherState.Error(
+                        error.message ?: "Unknown error occurred"
                     )
-
-                    _weatherState.postValue(
-                        WeatherState.Success(weather)
-                    )
-                },
-
-                onFailure = { error ->
-
-                    _weatherState.postValue(
-                        WeatherState.Error(
-                            error.message
-                                ?: "Unknown error occurred"
-                        )
-                    )
-                }
-            )
+                )
+            })
         }
     }
 
-    /**
-     * Store latitude/longitude only.
-     *
-     * No network call.
-     */
-    private fun storeLatLongOnly(
-        lat: String,
-        lon: String
-    ) {
-        sharedPref.setString(
-            Constants.UpdatedLat,
-            lat
-        )
-
-        sharedPref.setString(
-            Constants.UpdatedLong,
-            lon
-        )
+    private fun storeLatLongOnly(lat: String, lon: String) {
+        sharedPref.setString(Constants.UpdatedLat, lat)
+        sharedPref.setString(Constants.UpdatedLong, lon)
     }
 
-    /**
-     * Update latitude/longitude and fetch weather
-     * only when coordinates actually change.
-     */
-    fun storeLatLong(lat: String, lon: String) {
 
+    fun storeLatLong(lat: String, lon: String) {
         if (lat.isBlank() || lon.isBlank()) {
             return
         }
-
-        val storedLat =
-            sharedPref.getString(Constants.UpdatedLat)
-
-        val storedLon =
-            sharedPref.getString(Constants.UpdatedLong)
-
+        val storedLat = sharedPref.getString(Constants.UpdatedLat)
+        val storedLon = sharedPref.getString(Constants.UpdatedLong)
         if (lat == storedLat && lon == storedLon) {
             return
         }
-
-        storeLatLongOnly(
-            lat,
-            lon
-        )
-
-        fetchWeather(
-            lat,
-            lon
-        )
+        storeLatLongOnly(lat, lon)
+        fetchWeather(lat, lon)
     }
 
-    /**
-     * Save currently loaded weather.
-     */
+
     fun saveLocation() {
-
-        val weather = savedWeather
-            ?: return
-
+        val weather = savedWeather ?: return
         viewModelScope.launch {
-
             val location = UserLocationTableModel(
 
                 lat = weather.latitude.toString(),
@@ -233,29 +143,24 @@ class DashboardViewModel @Inject constructor(
                 icon = weather.weatherIcon,
 
                 sunrise = utcFormatted(
-                    weather.sunrise,
-                    Constants.timeAm
+                    weather.sunrise, Constants.timeAm
                 ).orEmpty(),
 
                 sunset = utcFormatted(
-                    weather.sunset,
-                    Constants.timeAm
+                    weather.sunset, Constants.timeAm
                 ).orEmpty(),
 
                 entryDateTime = utcFormatted(
-                    weather.timestamp,
-                    Constants.dateTimeAm
+                    weather.timestamp, Constants.dateTimeAm
                 ).orEmpty()
             )
 
             sharedPref.setString(
-                Constants.UpdatedLat,
-                location.lat
+                Constants.UpdatedLat, location.lat
             )
 
             sharedPref.setString(
-                Constants.UpdatedLong,
-                location.lon
+                Constants.UpdatedLong, location.lon
             )
 
             locationUseCase.saveLocation(
@@ -272,8 +177,8 @@ class DashboardViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val email = sharedPref.getString(
-                        Constants.PrimaryEmail
-                    ).orEmpty()
+                    Constants.PrimaryEmail
+                ).orEmpty()
                 locationUseCase.deleteOldLocations(email)
             } catch (_: Exception) {
                 _locationState.postValue(
@@ -296,13 +201,11 @@ class DashboardViewModel @Inject constructor(
     }
 
     fun utcFormatted(
-        time: Long,
-        pattern: String
+        time: Long, pattern: String
     ): String? {
         return try {
             SimpleDateFormat(
-                pattern,
-                Locale.ENGLISH
+                pattern, Locale.ENGLISH
             ).format(
                 Date(time * 1000)
             )
@@ -314,24 +217,13 @@ class DashboardViewModel @Inject constructor(
     }
 
     sealed class WeatherState {
-
         object Loading : WeatherState()
-
-        data class Success(
-            val weather: WeatherModel
-        ) : WeatherState()
-
-        data class Error(
-            val message: String
-        ) : WeatherState()
+        data class Success(val weather: WeatherModel) : WeatherState()
+        data class Error(val message: String) : WeatherState()
     }
 
     sealed class LocationState {
-
         object Saved : LocationState()
-
-        data class Error(
-            val message: String
-        ) : LocationState()
+        data class Error(val message: String) : LocationState()
     }
 }

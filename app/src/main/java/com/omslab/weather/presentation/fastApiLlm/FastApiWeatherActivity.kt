@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.speech.RecognizerIntent
 import android.view.View
 import android.widget.TextView
@@ -85,6 +86,9 @@ class FastApiWeatherActivity : AppCompatActivity() {
         etClaimInput.doAfterTextChanged { text ->
             viewModel.onInputChanged(text?.toString().orEmpty())
         }
+        binding.btnRetry.setOnClickListener {
+            viewModel.onSendClicked()
+        }
     }
 
     private fun onMicClicked() {
@@ -136,6 +140,20 @@ class FastApiWeatherActivity : AppCompatActivity() {
             tvError.visibility = state.error.asVisibility()
             tvError.text = state.error.orEmpty()
         }
+
+        viewModel.uiState.observe(this@FastApiWeatherActivity) { state ->
+
+            if (state.retrySeconds > 0) {
+                binding.tvRetryTimer.visibility = View.VISIBLE
+                binding.tvRetryTimer.text =
+                    "Retry available in ${state.retrySeconds}s"
+
+                binding.btnRetry.isEnabled = false
+            } else {
+                binding.tvRetryTimer.visibility = View.GONE
+                binding.btnRetry.isEnabled = true
+            }
+        }
     }
 
     private fun observeEvents() {
@@ -172,12 +190,10 @@ class FastApiWeatherActivity : AppCompatActivity() {
         }
     }
 
-    private fun toast(msg: String) =
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+    private fun toast(msg: String) = Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
 
-    private fun Boolean.asVisibility(): Int =
-        if (this) View.VISIBLE else View.GONE
+    private fun Boolean.asVisibility(): Int = if (this) View.VISIBLE else View.GONE
 
-    private fun String?.asVisibility(): Int =
-        if (isNullOrBlank()) View.GONE else View.VISIBLE
+    private fun String?.asVisibility(): Int = if (isNullOrBlank()) View.GONE else View.VISIBLE
+
 }

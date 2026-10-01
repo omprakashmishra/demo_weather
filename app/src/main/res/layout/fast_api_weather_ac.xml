@@ -170,17 +170,44 @@
                 android:visibility="gone" />
 
             <!-- Error -->
-            <TextView
-                android:id="@+id/tvError"
+            <!-- Error / Retry -->
+            <LinearLayout
+                android:id="@+id/retryContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:orientation="vertical"
                 android:gravity="center"
-                android:textColor="@android:color/holo_red_dark"
-                android:textSize="14sp"
-                android:visibility="gone"
-                tools:text="Something went wrong. Please try again." />
+                android:visibility="gone">
 
+                <TextView
+                    android:id="@+id/tvError"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textColor="@android:color/holo_red_dark"
+                    android:textSize="14sp"
+                    tools:text="Gemini quota exceeded." />
+
+                <TextView
+                    android:id="@+id/tvRetryTimer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Retry available in 46s"
+                    android:textColor="@android:color/darker_gray"
+                    android:textSize="14sp"
+                    android:visibility="gone" />
+
+                <Button
+                    android:id="@+id/btnRetry"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Retry"
+                    android:enabled="false" />
+
+            </LinearLayout>
             <!-- Bottom spacer so last item isn't hidden behind input bar -->
             <View
                 android:layout_width="match_parent"
@@ -188,6 +215,7 @@
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
 
     <!-- ================= Bottom Input Bar (ChatGPT style) ================= -->
     <LinearLayout

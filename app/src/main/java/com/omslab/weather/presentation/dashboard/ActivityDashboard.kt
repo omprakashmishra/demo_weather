@@ -139,4 +139,14 @@ class ActivityDashboard : AppCompatActivity() {
             }
         }
     }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.hasLoaded = false
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.hasLoaded = true
+    }
 }

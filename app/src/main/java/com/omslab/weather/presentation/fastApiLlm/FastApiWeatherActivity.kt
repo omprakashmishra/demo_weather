@@ -33,7 +33,6 @@ class FastApiWeatherActivity : AppCompatActivity() {
     private val viewModel: FastApiWeatherViewModel by viewModels()
 
     // ---------------- Speech ----------------
-
     private val speechLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -53,7 +52,6 @@ class FastApiWeatherActivity : AppCompatActivity() {
         if (granted) launchSpeechRecognizer()
         else toast("Microphone permission required")
     }
-
     // ---------------- Lifecycle ----------------
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -83,12 +81,6 @@ class FastApiWeatherActivity : AppCompatActivity() {
         btnCheck.setOnClickListener { viewModel.onSendClicked() }
         btnMic.setOnClickListener { onMicClicked() }
 
-        etClaimInput.doAfterTextChanged { text ->
-            viewModel.onInputChanged(text?.toString().orEmpty())
-        }
-        binding.btnRetry.setOnClickListener {
-            viewModel.onSendClicked()
-        }
     }
 
     private fun onMicClicked() {
@@ -141,19 +133,7 @@ class FastApiWeatherActivity : AppCompatActivity() {
             tvError.text = state.error.orEmpty()
         }
 
-        viewModel.uiState.observe(this@FastApiWeatherActivity) { state ->
 
-            if (state.retrySeconds > 0) {
-                binding.tvRetryTimer.visibility = View.VISIBLE
-                binding.tvRetryTimer.text =
-                    "Retry available in ${state.retrySeconds}s"
-
-                binding.btnRetry.isEnabled = false
-            } else {
-                binding.tvRetryTimer.visibility = View.GONE
-                binding.btnRetry.isEnabled = true
-            }
-        }
     }
 
     private fun observeEvents() {
@@ -174,7 +154,6 @@ class FastApiWeatherActivity : AppCompatActivity() {
     }
 
     // ---------------- Helpers ----------------
-
     private fun renderSources(sources: List<Source>) = with(binding.sourcesContainer) {
         removeAllViews()
         sources.forEach { source ->

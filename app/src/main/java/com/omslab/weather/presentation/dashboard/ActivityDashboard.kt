@@ -15,6 +15,7 @@ import com.omslab.weather.databinding.ActivityDashboardBinding
 import com.omslab.weather.presentation.dashboard.adapter.DashboardPagerAdapter
 import com.omslab.weather.presentation.loginReg.LoginAc
 import com.omslab.weather.common.util.Constants.PERMISSION_REQUEST_ACCESS_FINE_LOCATION
+import com.omslab.weather.presentation.fastApiLlm.FastApiWeatherActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -37,6 +38,10 @@ class ActivityDashboard : AppCompatActivity() {
             viewModel.deleteOldLocations()
             intent = Intent(this, LoginAc::class.java)
             finish()
+            this.startActivity(intent)
+        }
+        binding.micButton.setOnClickListener {
+            intent = Intent(this, FastApiWeatherActivity::class.java)
             startActivity(intent)
         }
 

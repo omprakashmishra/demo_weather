@@ -30,18 +30,10 @@ class FastApiWeatherViewModel @Inject constructor(
 
     // ---------------- Input ----------------
 
-    fun onInputChanged(text: String) =
-        update {
-            copy(
-                input = text,
-                error = null
-            )
-        }
+    fun onClaimChanged(value: String) {
+        _uiState.value = _uiState.value?.copy(input = value)
+    }
 
-    fun onMicToggled() =
-        update {
-            copy(isListening = !isListening)
-        }
 
     fun onVoiceResult(text: String) =
         update { copy(input = text, isListening = false, error = null)

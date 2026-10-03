@@ -10,6 +10,7 @@ import javax.inject.Singleton
 class FactCheckRepository @Inject constructor(
     private val dataSource: FactCheckDS
 ) {
-    suspend fun factCheck(claim: String): ApiResult<FactCheckModel> =
-        dataSource.factCheck(FactCheckModel(claim = claim))
+
+    suspend fun factCheck(claim: String): ApiResult<FactCheckModel> = dataSource.factCheck(FactCheckModel(claim = claim))
+
 }

@@ -252,7 +252,7 @@
 
         <!-- Send button (circular) -->
         <ImageButton
-            android:id="@+id/btnCheck"
+            android:id="@+id/btnSubmit"
             android:layout_width="52dp"
             android:layout_height="52dp"
             android:layout_marginStart="8dp"

@@ -78,9 +78,20 @@ class FastApiWeatherActivity : AppCompatActivity() {
     }
 
     private fun bindListeners() = with(binding) {
-        btnCheck.setOnClickListener { viewModel.onSendClicked() }
+
         btnMic.setOnClickListener { onMicClicked() }
 
+        btnSubmit.setOnClickListener {
+            viewModel.onSendClicked()
+        }
+
+        btnMic.setOnClickListener {
+            onMicClicked()
+        }
+
+        etClaimInput.doAfterTextChanged {
+            viewModel.onClaimChanged(it?.toString().orEmpty())
+        }
     }
 
     private fun onMicClicked() {
@@ -110,7 +121,6 @@ class FastApiWeatherActivity : AppCompatActivity() {
     private fun observeState() = with(binding) {
         viewModel.uiState.observe(this@FastApiWeatherActivity) { state ->
             progressLoading.visibility = state.isLoading.asVisibility()
-            btnCheck.isEnabled = state.canSend
             btnMic.alpha = if (state.isListening) 0.5f else 1f
 
             // Sync EditText only when the change came from outside (voice)
